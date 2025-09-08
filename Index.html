@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Web App Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+  .profile-card { background: #fff; border-radius: 12px; padding: 20px; max-width: 400px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+  .profile-pic { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #1e293b; }
+  .user-info h2 { margin: 0; font-size: 20px; }
+  .user-info p { margin: 2px 0; color: #555; }
+  .other-info p { margin: 5px 0; }
+  input { padding: 5px; margin: 5px 0; width: 100%; }
+  button { padding: 10px; margin-top: 10px; width: 100%; background: #1e293b; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="profile-card">
+  <div class="top-section">
+    <img id="profilePic" class="profile-pic" src="" alt="Profile Picture">
+    <div class="user-info">
+      <h2 id="userName">Name</h2>
+      <p>ID: <span id="userId"></span></p>
+      <p>Username: <span id="userUsername"></span></p>
+    </div>
+  </div>
+
+  <div class="other-info">
+    <p>Email: <input id="userEmail" placeholder="Enter Email"></p>
+    <p>City: <input id="userCity" placeholder="Enter City"></p>
+    <p>Balance: $<input id="userBalance" type="number" step="0.01"></p>
+    <p>Referral ID: <input id="userRef" placeholder="Referral ID"></p>
+    <button id="saveBtn">Save Info Locally</button>
+  </div>
+</div>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  const user = tg.initDataUnsafe.user;
+
+  // Basic Telegram info
+  document.getElementById('userName').innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
+  document.getElementById('userId').innerText = user.id;
+  document.getElementById('userUsername').innerText = user.username || 'No username';
+
+  if(user.photo_url){
+    document.getElementById('profilePic').src = user.photo_url;
+  } else {
+    document.getElementById('profilePic').src = 'https://via.placeholder.com/70';
+  }
+
+  // Load saved info from localStorage
+  const emailKey = `email_${user.id}`;
+  const cityKey = `city_${user.id}`;
+  const balanceKey = `balance_${user.id}`;
+  const refKey = `ref_${user.id}`;
+
+  document.getElementById('userEmail').value = localStorage.getItem(emailKey) || '';
+  document.getElementById('userCity').value = localStorage.getItem(cityKey) || '';
+  document.getElementById('userBalance').value = localStorage.getItem(balanceKey) || '0';
+  document.getElementById('userRef').value = localStorage.getItem(refKey) || '';
+
+  // Save data to localStorage
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    localStorage.setItem(emailKey, document.getElementById('userEmail').value);
+    localStorage.setItem(cityKey, document.getElementById('userCity').value);
+    localStorage.setItem(balanceKey, document.getElementById('userBalance').value);
+    localStorage.setItem(refKey, document.getElementById('userRef').value);
+    alert('Information saved locally!');
+  });
+</script>
+
+</body>
+</html>
